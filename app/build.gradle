@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'kotlin-android'
 }
 
 android {
@@ -58,9 +59,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     //// For The Authentication
     implementation 'com.google.firebase:firebase-auth'
-
-    // Used for loading animation
-    implementation project(':easy-loading')
 
     // Google's ML Kit for the Face Detection part....
     implementation 'com.google.mlkit:face-detection:16.1.5'

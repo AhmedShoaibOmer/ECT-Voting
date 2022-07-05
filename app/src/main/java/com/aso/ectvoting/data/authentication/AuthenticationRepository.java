@@ -1,6 +1,7 @@
 package com.aso.ectvoting.data.authentication;
 
 import com.aso.ectvoting.data.Result;
+import com.aso.ectvoting.data.ResultCallback;
 import com.aso.ectvoting.data.models.User;
 
 /**
@@ -44,21 +45,23 @@ public class AuthenticationRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<User> login(String email, String password) {
+    public void login(String email, String password, ResultCallback<User> callback) {
         // handle login
-        Result<User> result = dataSource.login(email, password);
-        if (result instanceof Result.Success) {
-            setLoggedInUser(((Result.Success<User>) result).getData());
-        }
-        return result;
+        dataSource.login(email, password, result -> {
+            if (result instanceof Result.Success) {
+                setLoggedInUser(((Result.Success<User>) result).getData());
+            }
+            callback.onComplete(result);
+        });
     }
 
-    public Result<User> register(String email, String password, String fullName, String base64Face, String natID) {
-        // handle login
-        Result<User> result = dataSource.register(email, password, fullName, base64Face, natID);
-        if (result instanceof Result.Success) {
-            setLoggedInUser(((Result.Success<User>) result).getData());
-        }
-        return result;
+    public void register(String email, String password, String fullName, String base64Face, String natID, ResultCallback<User> callback) {
+        // handle register
+        dataSource.register(email, password, fullName, base64Face, natID, result -> {
+            if (result instanceof Result.Success) {
+                setLoggedInUser(((Result.Success<User>) result).getData());
+            }
+            callback.onComplete(result);
+        });
     }
 }

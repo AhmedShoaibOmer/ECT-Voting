@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import android.util.Patterns;
 
 import com.aso.ectvoting.R;
+import com.aso.ectvoting.data.ResultCallback;
 import com.aso.ectvoting.data.authentication.AuthenticationRepository;
 import com.aso.ectvoting.data.Result;
 import com.aso.ectvoting.data.models.User;
@@ -34,14 +35,14 @@ public class LoginViewModel extends ViewModel {
 
     public void login(String email, String password) {
         // can be launched in a separate asynchronous job
-        Result<User> result = authenticationRepository.login(email, password);
-
-        if (result instanceof Result.Success) {
-            User data = ((Result.Success<User>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getFullName(), data.userFaceBase64())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
+        authenticationRepository.login(email, password, result -> {
+            if (result instanceof Result.Success) {
+                User data = ((Result.Success<User>) result).getData();
+                loginResult.setValue(new LoginResult(new LoggedInUserView(data.getFullName(), data.userFaceBase64())));
+            } else {
+                loginResult.setValue(new LoginResult(R.string.login_failed));
+            }
+        });
     }
 
     public void loginDataChanged(String email, String password) {

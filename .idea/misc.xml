@@ -22,6 +22,7 @@
         <entry key="app/src/main/res/layout/image_edit_dialog.xml" value="0.1381340579710145" />
         <entry key="app/src/main/res/layout/layout_login.xml" value="0.33" />
         <entry key="app/src/main/res/layout/layout_register.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/progress_dialog_view.xml" value="0.22" />
         <entry key="app/src/main/res/layout/tfe_od_activity_camera.xml" value="0.1" />
         <entry key="app/src/main/res/layout/tfe_od_camera_connection_fragment_tracking.xml" value="0.1" />
         <entry key="app/src/main/res/layout/tfe_od_layout_bottom_sheet.xml" value="0.5" />

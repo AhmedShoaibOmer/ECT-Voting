@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.aso.ectvoting.R;
 import com.aso.ectvoting.data.Result;
+import com.aso.ectvoting.data.ResultCallback;
 import com.aso.ectvoting.data.authentication.AuthenticationRepository;
 import com.aso.ectvoting.data.models.User;
 import com.aso.ectvoting.ui.authentication.customview.LoggedInUserView;
@@ -34,14 +35,15 @@ public class RegisterViewModel extends ViewModel {
 
     public void register(String email, String password, String fullName,  String base64Face, String natID) {
         // can be launched in a separate asynchronous job
-        Result<User> result = authenticationRepository.register(email, password, fullName, base64Face,natID);
+        authenticationRepository.register(email, password, fullName, base64Face, natID, result -> {
+            if (result instanceof Result.Success) {
+                User data = ((Result.Success<User>) result).getData();
+                RegisterResult.setValue(new RegisterResult(new LoggedInUserView(data.getFullName(), base64Face)));
+            } else {
+                RegisterResult.setValue(new RegisterResult(R.string.register_failed));
+            }
+        });
 
-        if (result instanceof Result.Success) {
-            User data = ((Result.Success<User>) result).getData();
-            RegisterResult.setValue(new RegisterResult(new LoggedInUserView(data.getFullName(), base64Face)));
-        } else {
-            RegisterResult.setValue(new RegisterResult(R.string.login_failed));
-        }
     }
 
     // TODO : Complete this
@@ -51,7 +53,7 @@ public class RegisterViewModel extends ViewModel {
         } else if (!isPasswordValid(password)) {
             //registerFormState.setValue(new RegisterFormState(null, R.string.invalid_password, confirmPasswordError, fullNameError, natIDError, base64FaceError));
         } else {
-            //registerFormState.setValue(new RegisterFormState(fullNameError, true));
+            registerFormState.setValue(new RegisterFormState(true));
         }
     }
 

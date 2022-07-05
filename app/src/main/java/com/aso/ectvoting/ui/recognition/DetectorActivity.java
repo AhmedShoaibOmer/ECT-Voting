@@ -326,14 +326,14 @@ public class DetectorActivity extends CameraActivity {
 
         builder.setPositiveButton("OK", (dlg, i) -> {
 
-            String name = etName.getText().toString();
-            if (name.isEmpty()) {
+            //String name = etName.getText().toString();
+/*            if (name.isEmpty()) {
                 return;
-            }
-            detector.register(name, rec);
-            knownFaces.put(name, rec);
+            }*/
+            //detector.register(name, rec);
+            //knownFaces.put(name, rec);
 
-            LOGGER.e("Size of the Face in Bytes %d%", rec.getCrop().getByteCount());
+            //LOGGER.e("Size of the Face in Bytes %d%", rec.getCrop().getByteCount());
 
             sendBase64Face(ImageUtils.getBase64StringFromBitmap(rec.getCrop()));
             dlg.dismiss();
@@ -441,7 +441,7 @@ public class DetectorActivity extends CameraActivity {
 
             if (crop != null) {
                 LOGGER.e("Size of the face " + crop.getByteCount());
-                ImageUtils.getBase64StringFromBitmap(crop);
+                //ImageUtils.getBase64StringFromBitmap(crop);
             }
 
             final long startTime = SystemClock.uptimeMillis();

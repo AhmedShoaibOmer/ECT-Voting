@@ -1,6 +1,7 @@
 package com.aso.ectvoting.data.authentication;
 
 import com.aso.ectvoting.data.Result;
+import com.aso.ectvoting.data.ResultCallback;
 import com.aso.ectvoting.data.models.User;
 import com.aso.ectvoting.utils.Logger;
 import com.google.firebase.auth.FirebaseAuth;
@@ -10,7 +11,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
+
+
+interface AuthRequestCallback {
+    void onSuccess();
+
+    void onFailure();
+}
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
@@ -23,11 +30,7 @@ public class AuthenticationDataSource {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public Result<User> login(String email, String password) {
-
-        Map<String, Object> userData = new HashMap<>();
-        final boolean[] succeeded = {false};
-        AtomicReference<Exception> cause = new AtomicReference<>();
+    public void login(String email, String password, ResultCallback<User> callback) {
 
         try {
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
@@ -36,72 +39,61 @@ public class AuthenticationDataSource {
                         if (task.isSuccessful()) {
                             db.collection("users").document(id).get().addOnCompleteListener(
                                     (task1 -> {
-                                        if(task1.isSuccessful()) {
+                                        if (task1.isSuccessful()) {
+                                            Map<String, Object> userData = new HashMap<>();
                                             userData.putAll(Objects.requireNonNull(task1.getResult().getData()));
+                                            callback.onComplete(new Result.Success<User>(User.fromMap(userData)));
                                         } else {
-                                            succeeded[0] = false;
-                                            cause.set(task1.getException());
+                                            callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + task1.getException())));
                                         }
-
                                     })
                             );
                         } else {
-                            succeeded[0] = false;
-                            cause.set(task.getException());
+                            callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + task.getException())));
                         }
                     })
             );
         } catch (Exception e) {
-            return new Result.Error<User>(new IOException("Error logging in", e));
-        }
-        if (succeeded[0]) {
-            return new Result.Success<User>(User.fromMap(userData));
-        } else {
-            return new Result.Error<User>(new IOException("Error logging in", cause.get()));
+            callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + e)));
         }
     }
 
-    public Result<User> register(String email, String password, String fullName, String base64Face, String natId) {
-        final boolean[] succeeded = {false};
-        AtomicReference<Exception> cause = new AtomicReference<>();
-        User user = new User(
-                natId,
-                fullName,
-                email,
-                base64Face
-        );
-        try {
-            mAuth.createUserWithEmailAndPassword(user.getEmail(), password).
+    public void register(String email, String password, String fullName, String base64Face, String natId,
+                         ResultCallback<User> callback) {
 
-                    addOnCompleteListener
-                    (task -> {
-                        if (task.isSuccessful()) {
-                            String id = Objects.requireNonNull(task.getResult().getUser()).getUid();
-                            db.collection("users")
-                                    .document(id)
-                                    .set(user)
-                                    .addOnSuccessListener(documentReference -> {
-                                        LOGGER.d("DocumentSnapshot added with ID: " + id);
-                                        succeeded[0] = true;
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        LOGGER.w("Error adding document", e);
-                                        succeeded[0] = false;
-                                        cause.set(e);
-                                    });
-                        } else {
-                            succeeded[0] = false;
-                            cause.set(task.getException());
-                        }
-                    });
+
+        try {
+            LOGGER.d("Authenticating....");
+            User user = new User(
+                    natId,
+                    fullName,
+                    email,
+                    base64Face
+            );
+            mAuth.createUserWithEmailAndPassword(user.getEmail(), password)
+                    .addOnCompleteListener
+                            (task -> {
+                                if (task.isSuccessful()) {
+                                    String id = Objects.requireNonNull(task.getResult().getUser()).getUid();
+                                    db.collection("users")
+                                            .document(id)
+                                            .set(user.toMap())
+                                            .addOnSuccessListener(documentReference -> {
+                                                LOGGER.d("Document added with ID: " + id);
+                                                callback.onComplete(new Result.Success<User>(user));
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                LOGGER.w("Error adding document", e);
+                                                callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", e)));
+                                            });
+                                } else {
+                                    callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", task.getException())));
+                                }
+                            });
 
         } catch (Exception e) {
-            return new Result.Error<User>(new IOException("Error Creating new user", e));
-        }
-        if (succeeded[0]) {
-            return new Result.Success<User>(user);
-        } else {
-            return new Result.Error<User>(new IOException("Error Creating new user", cause.get()));
+            //LOGGER.w("Error adding User" + cause.get().toString());
+            callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", e)));
         }
     }
 

@@ -21,12 +21,14 @@ import com.aso.ectvoting.ui.authentication.customview.LoggedInUserView;
 import com.aso.ectvoting.ui.authentication.login.LoginActivity;
 import com.aso.ectvoting.ui.authentication.register.viewmodel.RegisterViewModel;
 import com.aso.ectvoting.ui.authentication.register.viewmodel.RegisterViewModelFactory;
+import com.aso.ectvoting.ui.customview.CustomProgressDialog;
 import com.aso.ectvoting.ui.home.HomeActivity;
 import com.aso.ectvoting.ui.recognition.DetectorActivity;
-import com.gk.emon.lovelyLoading.LoadingPopup;
+import com.aso.ectvoting.utils.Logger;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class RegisterActivity extends AppCompatActivity {
+    private static final Logger LOGGER = new Logger();
 
     private RegisterViewModel registerViewModel;
 
@@ -43,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     if (result.getData() != null) {
                         base64Face = result.getData().getStringExtra("base64Face");
+                        LOGGER.d("User base 64 String : " + base64Face);
                         registerViewModel.registerDataChanged(emailEditText.getText().toString(),
                                 passwordEditText.getText().toString(),
                                 confirmPasswordEditText.getText().toString(),
@@ -50,6 +53,8 @@ public class RegisterActivity extends AppCompatActivity {
                                 natIDEditText.getText().toString(),
                                 base64Face
                                 );
+                    } else {
+                        LOGGER.d("Use base 64 String retrieval failed " + base64Face);
                     }
                 }
             });
@@ -62,9 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // Needed for the loading overlay
-        LoadingPopup.getInstance(this)
-                .defaultLovelyLoading()
-                .build();
+        CustomProgressDialog progressDialog = new CustomProgressDialog(this);
 
         registerViewModel = new ViewModelProvider(this, new RegisterViewModelFactory())
                 .get(RegisterViewModel.class);
@@ -99,16 +102,16 @@ public class RegisterActivity extends AppCompatActivity {
             if (registerResult == null) {
                 return;
             }
-            LoadingPopup.hideLoadingPopUp();
+            progressDialog.stop();
             if (registerResult.getError() != null) {
                 showRegistrationFailed(registerResult.getError());
             }
             if (registerResult.getSuccess() != null) {
                 updateUiWithUser(registerResult.getSuccess());
+                Intent switchActivity = new Intent(this, HomeActivity.class);
+                startActivity(switchActivity);
             }
 
-            Intent switchActivity = new Intent(this, HomeActivity.class);
-            startActivity(switchActivity);
         });
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -146,12 +149,12 @@ base64Face
                 }
         );
         registerButton.setOnClickListener(v -> {
-            LoadingPopup.showLoadingPopUp();
+            progressDialog.start("Please Wait...");
             registerViewModel.register(emailEditText.getText().toString(),
                     passwordEditText.getText().toString(),
                     fullNameEditText.getText().toString(),
-                    natIDEditText.getText().toString(),
-                    base64Face
+                    base64Face,
+                    natIDEditText.getText().toString()
                     );
         });
 

@@ -1,31 +1,30 @@
 package com.aso.ectvoting.ui.authentication.login;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.aso.ectvoting.R;
 import com.aso.ectvoting.databinding.ActivityLoginBinding;
 import com.aso.ectvoting.ui.authentication.customview.LoggedInUserView;
 import com.aso.ectvoting.ui.authentication.login.viewmodel.LoginViewModel;
 import com.aso.ectvoting.ui.authentication.login.viewmodel.LoginViewModelFactory;
+import com.aso.ectvoting.ui.authentication.register.RegisterActivity;
+import com.aso.ectvoting.ui.customview.CustomProgressDialog;
 import com.aso.ectvoting.ui.home.HomeActivity;
 import com.aso.ectvoting.ui.recognition.DetectorActivity;
-import com.gk.emon.lovelyLoading.LoadingPopup;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
@@ -50,9 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // Needed for the loading overlay
-        LoadingPopup.getInstance(this)
-                .defaultLovelyLoading()
-                .build();
+        CustomProgressDialog progressDialog = new CustomProgressDialog(this);
 
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
@@ -79,18 +76,18 @@ public class LoginActivity extends AppCompatActivity {
             if (loginResult == null) {
                 return;
             }
-            LoadingPopup.hideLoadingPopUp();
+            progressDialog.stop();
             if (loginResult.getError() != null) {
                 showLoginFailed(loginResult.getError());
             }
             if (loginResult.getSuccess() != null) {
                 updateUiWithUser(loginResult.getSuccess());
-            }
 
-            Intent switchActivity = new Intent(this, DetectorActivity.class);
-            switchActivity.putExtra("base64Face", loginResult.getSuccess().getBase64Face());
-            switchActivity.putExtra("fullName", loginResult.getSuccess().getFullName());
-            mCheckFace.launch(switchActivity);
+                Intent switchActivity = new Intent(this, DetectorActivity.class);
+                switchActivity.putExtra("base64Face", loginResult.getSuccess().getBase64Face());
+                switchActivity.putExtra("fullName", loginResult.getSuccess().getFullName());
+                mCheckFace.launch(switchActivity);
+            }
         });
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -121,9 +118,14 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         loginButton.setOnClickListener(v -> {
-            LoadingPopup.showLoadingPopUp();
+            progressDialog.start("Please Wait....");
             loginViewModel.login(emailEditText.getText().toString(),
                     passwordEditText.getText().toString());
+        });
+
+        registerButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 
