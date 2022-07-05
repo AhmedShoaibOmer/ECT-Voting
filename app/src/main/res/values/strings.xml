@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">ECT Voting</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="register">REGISTER</string>
+    <string name="login_email_hint">Email</string>
+    <string name="login_password_hint">Password</string>
+    <string name="signup_login_hint">Already have an account? Sign In</string>
+    <string name="login_signup_hint">Don\'t have an account? Sign Up</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login">LOGIN</string>
+    <string name="full_name_hint">Full Name</string>
+    <string name="national_id">National ID</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="capture_face">Capture Face</string>
+    <string name="title_register_activity">RegisterActivity</string>
+</resources>

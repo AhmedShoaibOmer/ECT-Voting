@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "750139168796",
+    "project_id": "ectvoting-efa5c",
+    "storage_bucket": "ectvoting-efa5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750139168796:android:29b479bfa4149b64b3e7d9",
+        "android_client_info": {
+          "package_name": "com.aso.ectvoting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750139168796-0mu0k25nkgkg5mfb2milhuire0sjt58p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHYo12os0i859tKHDI9g5HboU_E-Oqww8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750139168796-0mu0k25nkgkg5mfb2milhuire0sjt58p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
