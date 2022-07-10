@@ -43,28 +43,28 @@ public class AuthenticationDataSource {
                                         if (task1.isSuccessful()) {
                                             Map<String, Object> userData = new HashMap<>(Objects.requireNonNull(task1.getResult().getData()));
                                             userData.put("id", id);
-                                            callback.onComplete(new Result.Success<User>(User.fromMap(userData)));
+                                            callback.onComplete(new Result.Success<>(User.fromMap(userData)));
                                         } else {
-                                            callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + task1.getException())));
+                                            callback.onComplete(new Result.Error<>(new IOException("Error logging in" + task1.getException())));
                                         }
                                     })
                             );
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                callback.onComplete(new Result.Error<User>(new AuthWrongCredentialsException()));
+                                callback.onComplete(new Result.Error<>(new AuthWrongCredentialsException()));
                             } else if(task.getException() instanceof FirebaseAuthInvalidUserException){
-                                callback.onComplete(new Result.Error<User>(new AuthNoUserFoundException()));
+                                callback.onComplete(new Result.Error<>(new AuthNoUserFoundException()));
                             } else if(task.getException() instanceof FirebaseNetworkException){
-                                callback.onComplete(new Result.Error<User>(new NetworkErrorException()));
+                                callback.onComplete(new Result.Error<>(new NetworkErrorException()));
                             } else {
                                 Objects.requireNonNull(task.getException()).printStackTrace();
-                                callback.onComplete(new Result.Error<User>(new IOException("Error logging in")));
+                                callback.onComplete(new Result.Error<>(new IOException("Error logging in")));
                             }
                         }
                     })
             );
         } catch (Exception e) {
-            callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + e)));
+            callback.onComplete(new Result.Error<>(new IOException("Error logging in" + e)));
         }
     }
 
@@ -90,33 +90,33 @@ public class AuthenticationDataSource {
                                             .set(user.toMap())
                                             .addOnSuccessListener(documentReference -> {
                                                 LOGGER.d("Document added with ID: " + id);
-                                                callback.onComplete(new Result.Success<User>(user));
+                                                callback.onComplete(new Result.Success<>(user));
                                             })
                                             .addOnFailureListener(e -> {
                                                 e.printStackTrace();
                                                 LOGGER.w("Error adding document", e);
-                                                callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", e)));
+                                                callback.onComplete(new Result.Error<>(new IOException("Error Creating new user", e)));
                                             });
                                 } else {
                                     if(task.getException() instanceof FirebaseAuthUserCollisionException){
-                                        callback.onComplete(new Result.Error<User>(new AuthEmailInUseException()));
+                                        callback.onComplete(new Result.Error<>(new AuthEmailInUseException()));
                                     } else if(task.getException() instanceof FirebaseNetworkException){
-                                        callback.onComplete(new Result.Error<User>(new NetworkErrorException()));
+                                        callback.onComplete(new Result.Error<>(new NetworkErrorException()));
                                     } else {
                                         Objects.requireNonNull(task.getException()).printStackTrace();
-                                        callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", task.getException())));
+                                        callback.onComplete(new Result.Error<>(new IOException("Error Creating new user", task.getException())));
                                     }
                                 }
                             });
 
         } catch (Exception e) {
             //LOGGER.w("Error adding User" + cause.get().toString());
-            callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", e)));
+            callback.onComplete(new Result.Error<>(new IOException("Error Creating new user", e)));
         }
     }
 
     public void logout(ResultCallback<Void> callback) {
         mAuth.signOut();
-        callback.onComplete(new Result.Success<Void>(null));
+        callback.onComplete(new Result.Success<>(null));
     }
 }
