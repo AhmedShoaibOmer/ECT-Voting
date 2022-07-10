@@ -78,7 +78,7 @@ public abstract class CameraActivity extends AppCompatActivity
 
         useFacing = intent.getIntExtra(KEY_USE_FACING, CameraCharacteristics.LENS_FACING_FRONT);
 
-        setContentView(R.layout.tfe_od_activity_camera);
+        setContentView(R.layout.activity_camera);
 
         if (hasPermission()) {
             setFragment();

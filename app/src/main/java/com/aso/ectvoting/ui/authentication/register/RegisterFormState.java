@@ -14,31 +14,31 @@ public class RegisterFormState {
     private final Integer confirmPasswordError;
     @Nullable
     private final Integer fullNameError;
+    @Nullable
+    private final Integer natIDError;
 
     @Nullable
     public Integer getConfirmPasswordError() {
         return confirmPasswordError;
     }
 
-    @Nullable
-    private final Integer natIDError;
-    @Nullable
-    private final Integer base64FaceError;
     private final boolean isDataValid;
 
-    public RegisterFormState(@Nullable Integer emailError, @Nullable Integer passwordError, @Nullable Integer confirmPasswordError, @Nullable Integer fullNameError, @Nullable Integer natIDError, @Nullable Integer base64FaceError) {
+    public RegisterFormState(@Nullable Integer emailError,
+                             @Nullable Integer passwordError,
+                             @Nullable Integer confirmPasswordError,
+                             @Nullable Integer fullNameError,
+                             @Nullable Integer natIDError) {
         this.emailError = emailError;
         this.passwordError = passwordError;
         this.confirmPasswordError = confirmPasswordError;
         this.fullNameError = fullNameError;
         this.natIDError = natIDError;
-        this.base64FaceError = base64FaceError;
         this.isDataValid = false;
     }
 
     public RegisterFormState(boolean isDataValid) {
         this.confirmPasswordError = null;
-        this.base64FaceError = null;
         this.natIDError = null;
         this.fullNameError = null;
         this.emailError = null;
@@ -59,11 +59,6 @@ public class RegisterFormState {
     @Nullable
     public Integer getNatIDError() {
         return natIDError;
-    }
-
-    @Nullable
-    public Integer getBase64FaceError() {
-        return base64FaceError;
     }
 
     @Nullable

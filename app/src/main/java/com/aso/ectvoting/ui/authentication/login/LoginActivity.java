@@ -23,21 +23,27 @@ import com.aso.ectvoting.ui.authentication.login.viewmodel.LoginViewModel;
 import com.aso.ectvoting.ui.authentication.login.viewmodel.LoginViewModelFactory;
 import com.aso.ectvoting.ui.authentication.register.RegisterActivity;
 import com.aso.ectvoting.ui.customview.CustomProgressDialog;
-import com.aso.ectvoting.ui.home.HomeActivity;
-import com.aso.ectvoting.ui.recognition.DetectorActivity;
+import com.aso.ectvoting.ui.vote.VoteActivity;
+import com.aso.ectvoting.ui.recognition.RecognitionActivity;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
+    private LoginResult loginResult;
 
     ActivityResultLauncher<Intent> mCheckFace = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent switchActivity = new Intent(this, HomeActivity.class);
+                    updateUiWithUser(Objects.requireNonNull(loginResult.getSuccess()));
+                    Intent switchActivity = new Intent(this, VoteActivity.class);
                     startActivity(switchActivity);
+                    finish();
                 } else {
                     // TODO : Face not recognized
+                    showLoginFailed(R.string.face_recognition_failed);
                 }
             });
 
@@ -81,10 +87,9 @@ public class LoginActivity extends AppCompatActivity {
                 showLoginFailed(loginResult.getError());
             }
             if (loginResult.getSuccess() != null) {
-                updateUiWithUser(loginResult.getSuccess());
-
-                Intent switchActivity = new Intent(this, DetectorActivity.class);
-                switchActivity.putExtra("base64Face", loginResult.getSuccess().getBase64Face());
+                this.loginResult = loginResult;
+                Intent switchActivity = new Intent(this, RecognitionActivity.class);
+                switchActivity.putExtra("embeedings", loginResult.getSuccess().getBase64Face());
                 switchActivity.putExtra("fullName", loginResult.getSuccess().getFullName());
                 mCheckFace.launch(switchActivity);
             }
@@ -118,14 +123,17 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         loginButton.setOnClickListener(v -> {
-            progressDialog.start("Please Wait....");
-            loginViewModel.login(emailEditText.getText().toString(),
-                    passwordEditText.getText().toString());
+            if(!emailEditText.getText().toString().isEmpty() || !passwordEditText.getText().toString().isEmpty()){
+                progressDialog.start(getString(R.string.logging_in));
+                loginViewModel.login(emailEditText.getText().toString(),
+                        passwordEditText.getText().toString());
+            }
         });
 
         registerButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, RegisterActivity.class);
             startActivity(intent);
+            finish();
         });
     }
 

@@ -268,7 +268,6 @@ public class TFLiteObjectDetectionAPIModel
 
             LOGGER.i("nearest: " + name + " - distance: " + distance);
 
-
         }
     }
 

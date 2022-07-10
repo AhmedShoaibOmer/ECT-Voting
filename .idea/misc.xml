@@ -16,10 +16,14 @@
         <entry key="app/src/main/res/drawable/rectangle.xml" value="0.195" />
         <entry key="app/src/main/res/layout-w1240dp/activity_login.xml" value="0.12282463186077644" />
         <entry key="app/src/main/res/layout-w936dp/activity_login.xml" value="0.1413934426229508" />
+        <entry key="app/src/main/res/layout/activity_camera.xml" value="0.1381340579710145" />
+        <entry key="app/src/main/res/layout/activity_home.xml" value="0.2" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.19114583333333332" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.17119565217391305" />
         <entry key="app/src/main/res/layout/activity_register.xml" value="0.1381340579710145" />
-        <entry key="app/src/main/res/layout/image_edit_dialog.xml" value="0.1381340579710145" />
+        <entry key="app/src/main/res/layout/activity_vote.xml" value="0.1480978260869565" />
+        <entry key="app/src/main/res/layout/camera_connection_fragment_tracking.xml" value="0.1381340579710145" />
+        <entry key="app/src/main/res/layout/image_edit_dialog.xml" value="0.33" />
         <entry key="app/src/main/res/layout/layout_login.xml" value="0.33" />
         <entry key="app/src/main/res/layout/layout_register.xml" value="0.22" />
         <entry key="app/src/main/res/layout/progress_dialog_view.xml" value="0.22" />

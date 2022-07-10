@@ -23,6 +23,7 @@ import com.aso.ectvoting.ui.authentication.register.viewmodel.RegisterViewModel;
 import com.aso.ectvoting.ui.authentication.register.viewmodel.RegisterViewModelFactory;
 import com.aso.ectvoting.ui.customview.CustomProgressDialog;
 import com.aso.ectvoting.ui.home.HomeActivity;
+import com.aso.ectvoting.ui.vote.VoteActivity;
 import com.aso.ectvoting.ui.recognition.DetectorActivity;
 import com.aso.ectvoting.utils.Logger;
 import com.google.android.material.textfield.TextInputEditText;
@@ -38,23 +39,22 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText passwordEditText;
     private TextInputEditText confirmPasswordEditText;
 
-    private String base64Face;
+    private String embeedings;
 
     ActivityResultLauncher<Intent> mGetBase64Face = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     if (result.getData() != null) {
-                        base64Face = result.getData().getStringExtra("base64Face");
-                        LOGGER.d("User base 64 String : " + base64Face);
+                        embeedings = result.getData().getStringExtra("embeedings");
+                        LOGGER.d("User Embeedings String : " + embeedings);
                         registerViewModel.registerDataChanged(emailEditText.getText().toString(),
                                 passwordEditText.getText().toString(),
                                 confirmPasswordEditText.getText().toString(),
                                 fullNameEditText.getText().toString(),
-                                natIDEditText.getText().toString(),
-                                base64Face
-                                );
+                                natIDEditText.getText().toString()
+                        );
                     } else {
-                        LOGGER.d("Use base 64 String retrieval failed " + base64Face);
+                        LOGGER.d("Use Embeedings String retrieval failed ");
                     }
                 }
             });
@@ -72,14 +72,14 @@ public class RegisterActivity extends AppCompatActivity {
         registerViewModel = new ViewModelProvider(this, new RegisterViewModelFactory())
                 .get(RegisterViewModel.class);
 
-       fullNameEditText = binding.editTextFullName;
-       natIDEditText = binding.editTextNatID;
-       emailEditText = binding.editTextEmail;
-       passwordEditText = binding.editTextPassword;
-       confirmPasswordEditText= binding.editTextConfirmPassword;
-       final Button faceCaptureButton = binding.faceCaptureButton;
-       final AppCompatButton registerButton = binding.cirRegisterButton;
-       final Button signInButton = binding.signInBtn;
+        fullNameEditText = binding.editTextFullName;
+        natIDEditText = binding.editTextNatID;
+        emailEditText = binding.editTextEmail;
+        passwordEditText = binding.editTextPassword;
+        confirmPasswordEditText = binding.editTextConfirmPassword;
+        final Button faceCaptureButton = binding.faceCaptureButton;
+        final AppCompatButton registerButton = binding.cirRegisterButton;
+        final Button signInButton = binding.signInBtn;
 
         registerViewModel.getRegisterFormState().observe(this, registerFormState -> {
             if (registerFormState == null) {
@@ -94,7 +94,13 @@ public class RegisterActivity extends AppCompatActivity {
                 confirmPasswordEditText.setError(getString(registerFormState.getPasswordError()));
             }
             if (registerFormState.getConfirmPasswordError() != null) {
-                confirmPasswordEditText.setError(getString(registerFormState.getPasswordError()));
+                confirmPasswordEditText.setError(getString(registerFormState.getConfirmPasswordError()));
+            }
+            if (registerFormState.getFullNameError() != null) {
+                fullNameEditText.setError(getString(registerFormState.getFullNameError()));
+            }
+            if (registerFormState.getNatIDError() != null) {
+                natIDEditText.setError(getString(registerFormState.getNatIDError()));
             }
         });
 
@@ -107,9 +113,9 @@ public class RegisterActivity extends AppCompatActivity {
                 showRegistrationFailed(registerResult.getError());
             }
             if (registerResult.getSuccess() != null) {
-                updateUiWithUser(registerResult.getSuccess());
                 Intent switchActivity = new Intent(this, HomeActivity.class);
                 startActivity(switchActivity);
+                finish();
             }
 
         });
@@ -131,9 +137,8 @@ public class RegisterActivity extends AppCompatActivity {
                         passwordEditText.getText().toString(),
                         confirmPasswordEditText.getText().toString(),
                         fullNameEditText.getText().toString(),
-                        natIDEditText.getText().toString(),
-base64Face
-                        );
+                        natIDEditText.getText().toString()
+                );
             }
         };
         emailEditText.addTextChangedListener(afterTextChangedListener);
@@ -149,13 +154,18 @@ base64Face
                 }
         );
         registerButton.setOnClickListener(v -> {
-            progressDialog.start("Please Wait...");
-            registerViewModel.register(emailEditText.getText().toString(),
-                    passwordEditText.getText().toString(),
-                    fullNameEditText.getText().toString(),
-                    base64Face,
-                    natIDEditText.getText().toString()
-                    );
+            if (embeedings != null && !embeedings.isEmpty()) {
+                progressDialog.start(getString(R.string.registering));
+                registerViewModel.register(emailEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        fullNameEditText.getText().toString(),
+                        embeedings,
+                        natIDEditText.getText().toString()
+                );
+            } else {
+                showRegistrationFailed(R.string.capture_face_prompt
+                );
+            }
         });
 
         signInButton.setOnClickListener(v -> {

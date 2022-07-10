@@ -1,23 +1,24 @@
 package com.aso.ectvoting.data.authentication;
 
+import com.aso.ectvoting.core.exception.AuthEmailInUseException;
+import com.aso.ectvoting.core.exception.AuthNoUserFoundException;
+import com.aso.ectvoting.core.exception.AuthWrongCredentialsException;
+import com.aso.ectvoting.core.exception.NetworkErrorException;
 import com.aso.ectvoting.data.Result;
 import com.aso.ectvoting.data.ResultCallback;
 import com.aso.ectvoting.data.models.User;
 import com.aso.ectvoting.utils.Logger;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-
-interface AuthRequestCallback {
-    void onSuccess();
-
-    void onFailure();
-}
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
@@ -35,13 +36,13 @@ public class AuthenticationDataSource {
         try {
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
                     (task -> {
-                        String id = Objects.requireNonNull(task.getResult().getUser()).getUid();
                         if (task.isSuccessful()) {
+                            String id = Objects.requireNonNull(task.getResult().getUser()).getUid();
                             db.collection("users").document(id).get().addOnCompleteListener(
                                     (task1 -> {
                                         if (task1.isSuccessful()) {
-                                            Map<String, Object> userData = new HashMap<>();
-                                            userData.putAll(Objects.requireNonNull(task1.getResult().getData()));
+                                            Map<String, Object> userData = new HashMap<>(Objects.requireNonNull(task1.getResult().getData()));
+                                            userData.put("id", id);
                                             callback.onComplete(new Result.Success<User>(User.fromMap(userData)));
                                         } else {
                                             callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + task1.getException())));
@@ -49,7 +50,16 @@ public class AuthenticationDataSource {
                                     })
                             );
                         } else {
-                            callback.onComplete(new Result.Error<User>(new IOException("Error logging in" + task.getException())));
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                callback.onComplete(new Result.Error<User>(new AuthWrongCredentialsException()));
+                            } else if(task.getException() instanceof FirebaseAuthInvalidUserException){
+                                callback.onComplete(new Result.Error<User>(new AuthNoUserFoundException()));
+                            } else if(task.getException() instanceof FirebaseNetworkException){
+                                callback.onComplete(new Result.Error<User>(new NetworkErrorException()));
+                            } else {
+                                Objects.requireNonNull(task.getException()).printStackTrace();
+                                callback.onComplete(new Result.Error<User>(new IOException("Error logging in")));
+                            }
                         }
                     })
             );
@@ -64,17 +74,17 @@ public class AuthenticationDataSource {
 
         try {
             LOGGER.d("Authenticating....");
-            User user = new User(
-                    natId,
-                    fullName,
-                    email,
-                    base64Face
-            );
-            mAuth.createUserWithEmailAndPassword(user.getEmail(), password)
+            mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener
                             (task -> {
                                 if (task.isSuccessful()) {
                                     String id = Objects.requireNonNull(task.getResult().getUser()).getUid();
+                                    User user = new User(
+                                            id, natId,
+                                            fullName,
+                                            email,
+                                            base64Face,
+                                            null);
                                     db.collection("users")
                                             .document(id)
                                             .set(user.toMap())
@@ -83,11 +93,19 @@ public class AuthenticationDataSource {
                                                 callback.onComplete(new Result.Success<User>(user));
                                             })
                                             .addOnFailureListener(e -> {
+                                                e.printStackTrace();
                                                 LOGGER.w("Error adding document", e);
                                                 callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", e)));
                                             });
                                 } else {
-                                    callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", task.getException())));
+                                    if(task.getException() instanceof FirebaseAuthUserCollisionException){
+                                        callback.onComplete(new Result.Error<User>(new AuthEmailInUseException()));
+                                    } else if(task.getException() instanceof FirebaseNetworkException){
+                                        callback.onComplete(new Result.Error<User>(new NetworkErrorException()));
+                                    } else {
+                                        Objects.requireNonNull(task.getException()).printStackTrace();
+                                        callback.onComplete(new Result.Error<User>(new IOException("Error Creating new user", task.getException())));
+                                    }
                                 }
                             });
 
@@ -97,7 +115,8 @@ public class AuthenticationDataSource {
         }
     }
 
-    public void logout() {
-        // TODO: revoke authentication
+    public void logout(ResultCallback<Void> callback) {
+        mAuth.signOut();
+        callback.onComplete(new Result.Success<Void>(null));
     }
 }

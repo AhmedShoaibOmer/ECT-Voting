@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ECT Voting</string>
+    <string name="welcome">"مرحبا !"</string>
+    <string name="invalid_password">كلمة السر يجب ان تكون اكثر من خمس خانات</string>
+    <string name="login_failed">"حدث خطأ ما, فشل تسجيل الدخول حاول مرة اخرى"</string>
+    <string name="register_failed">"حدث خطأ ما, فشل التسجيل حاول مرة اخرى"</string>
+    <string name="register">تسجيل</string>
+    <string name="login_email_hint">الإيميل</string>
+    <string name="login_password_hint">كلمة السر</string>
+    <string name="signup_login_hint">لديك حساب مسبقا؟ تسجسل الدخول</string>
+    <string name="login_signup_hint">ليس لديك حساب؟ قم التسجيل</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="full_name_hint">الإسم الكامل</string>
+    <string name="national_id">الرقم الوطني</string>
+    <string name="confirm_password">تأكيد كلمة السر</string>
+    <string name="capture_face">إلتقاط صورة الوجه</string>
+    <string name="wrong_credentials">الإيميل او كلمة السر غير صحيحان</string>
+    <string name="no_user_found">لا يوجد حساب مرتبط بهذا الإيميل قم بالتسجيل</string>
+    <string name="email_in_use">"هذا الإيميل مستخدم مسبقا"</string>
+    <string name="network_error">مشكلة في الإتصال بالشبكة, هل انت متصل بالنترنت؟</string>
+    <string name="face_recognition_failed">فشل التعرف على الوجه</string>
+    <string name="pick_your_candidate">قم بإختيار مرشحك :</string>
+    <string name="edit_choice">تعديل التصويت</string>
+    <string name="you_already_voted_to">لقد قمت بالتصويت مسبقا لصالح :</string>
+    <string name="vote">تصويت</string>
+    <string name="clear">مسح الخيار</string>
+    <string name="fetching_candidates_failed">حدث خطأ اثناء تحميل قائمة المرشحين</string>
+    <string name="voting_failed">فشلت عملية التصويت, حاول مرة اخرى</string>
+    <string name="voting">جاري التصويت....</string>
+    <string name="revoting">جاري إعادة التصويت....</string>
+    <string name="voting_successful">تم التصويت بنجاح</string>
+    <string name="select_your_candidate"> رجاء قم بإختيار مرشحك</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="logging_out">جاري تسجيل الخروج....</string>
+    <string name="logout_successful">تم تسجيل الخروج بنجاح</string>
+    <string name="invalid_email">هذا الإيميل غير صالح</string>
+    <string name="confirm_password_mismatch">كلمتا السر غير متطابقتان</string>
+    <string name="full_name_cant_be_empty">الإسم الكامل لا يمك ان يكون فارغا</string>
+    <string name="nat_id_name_cant_be_empty">الرقم الوطني لا يمك ان يكون فارغا</string>
+    <string name="capture_face_prompt">قم بإلتقاط صورة لوجهك بالضغط على الزر اعلاه</string>
+    <string name="confirm_your_face_is_clearly_visible">تأكد ان وجهك واضح في الصورة</string>
+    <string name="logging_in">Logging in....</string>
+    <string name="registering">Registering....</string>
+</resources>

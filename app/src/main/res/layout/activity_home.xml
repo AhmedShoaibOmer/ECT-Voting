@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/loginBkColor"
-    android:focusableInTouchMode="true"
-    tools:context=".ui.authentication.login.LoginActivity">
+    android:focusableInTouchMode="true">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,65 +74,28 @@
                     android:orientation="vertical"
                     android:padding="@dimen/loginViewsMargin">
 
-                    <TextView
-                        style="@style/headerTextPrimary"
+
+                    <Space
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/loginViewsMargin"
-                        android:text="@string/login" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/textInputEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/loginViewsMargin"
-                        android:textColorHint="@color/hint_text_color">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/editTextEmail"
-                            style="@style/modifiedEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/login_email_hint"
-                            android:inputType="textEmailAddress"
-                            android:maxLines="1" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/textInputPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/loginViewsMargin"
-                        android:textColorHint="@color/hint_text_color">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/editTextPassword"
-                            style="@style/modifiedEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/login_password_hint"
-                            android:inputType="numberPassword"
-                            android:maxLines="1" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="256dp" />
 
                     <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/cirLoginButton"
+                        android:id="@+id/voteButton"
                         style="@style/loginButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="16dp"
-                        android:text="@string/login" />
+                        android:text="@string/vote" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/register_btn"
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
+                        style="@style/loginButton"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/login_signup_hint"
-                        android:textColor="?android:attr/colorPrimary"
-                        android:textSize="@dimen/newsMoreTextSize" />
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/register" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

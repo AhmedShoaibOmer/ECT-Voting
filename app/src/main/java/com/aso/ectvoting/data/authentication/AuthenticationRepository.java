@@ -16,7 +16,7 @@ public class AuthenticationRepository {
 
     // If user credentials will be cached in local storage, it is recommended it be encrypted
     // @see https://developer.android.com/training/articles/keystore
-    private User user = null;
+    public User user = null;
 
     // private constructor : singleton access
     private AuthenticationRepository(AuthenticationDataSource dataSource) {
@@ -34,9 +34,9 @@ public class AuthenticationRepository {
         return user != null;
     }
 
-    public void logout() {
+    public void logout(ResultCallback<Void> callback) {
         user = null;
-        dataSource.logout();
+        dataSource.logout(callback);
     }
 
     private void setLoggedInUser(User user) {

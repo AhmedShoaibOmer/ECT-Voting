@@ -16,7 +16,6 @@
 
 package com.aso.ectvoting.ui.recognition;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,24 +28,18 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Size;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
 
 import com.aso.ectvoting.R;
 import com.aso.ectvoting.ui.recognition.customview.OverlayView;
 import com.aso.ectvoting.ui.recognition.env.BorderedText;
-import com.aso.ectvoting.utils.FloatArrayUtils;
-import com.aso.ectvoting.utils.ImageUtils;
-import com.aso.ectvoting.utils.Logger;
 import com.aso.ectvoting.ui.recognition.tflite.SimilarityClassifier;
 import com.aso.ectvoting.ui.recognition.tflite.TFLiteObjectDetectionAPIModel;
 import com.aso.ectvoting.ui.recognition.tracking.MultiBoxTracker;
+import com.aso.ectvoting.utils.FloatArrayUtils;
+import com.aso.ectvoting.utils.ImageUtils;
+import com.aso.ectvoting.utils.Logger;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
@@ -55,7 +48,7 @@ import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +56,7 @@ import java.util.List;
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
  * objects.
  */
-public class DetectorActivity extends CameraActivity {
+public class RecognitionActivity extends CameraActivity {
     private static final Logger LOGGER = new Logger();
 
     // MobileFaceNet
@@ -72,7 +65,7 @@ public class DetectorActivity extends CameraActivity {
     private static final String TF_OD_API_MODEL_FILE = "mobile_face_net.tflite";
     private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/labelmap.txt";
 
-    private static final DetectorMode MODE = DetectorMode.TF_OD_API;
+    //private static final DetectorMode MODE = DetectorMode.TF_OD_API;
     // Minimum detection confidence to track a detection.
     private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
     private static final boolean MAINTAIN_ASPECT = false;
@@ -110,15 +103,16 @@ public class DetectorActivity extends CameraActivity {
     // here the face is cropped and drawn
     private Bitmap faceBmp = null;
 
-    private final HashMap<String, SimilarityClassifier.Recognition> knownFaces = new HashMap<String, SimilarityClassifier.Recognition>();
 
+    private String currentUserFace;
+    private String currentUserFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FloatingActionButton fabAdd = findViewById(R.id.fab_add);
-        fabAdd.setOnClickListener(view -> addPending = true);
+        fabAdd.setVisibility(View.INVISIBLE);
 
         // Real-time contour detection of multiple faces
         FaceDetectorOptions options =
@@ -130,6 +124,9 @@ public class DetectorActivity extends CameraActivity {
 
 
         faceDetector = FaceDetection.getClient(options);
+
+        currentUserFace = getIntent().getStringExtra("embeedings");
+        currentUserFullName = getIntent().getStringExtra("fullName");
     }
 
     @Override
@@ -151,6 +148,19 @@ public class DetectorActivity extends CameraActivity {
                             TF_OD_API_LABELS_FILE,
                             TF_OD_API_INPUT_SIZE,
                             TF_OD_API_IS_QUANTIZED);
+
+
+                float[] floats = FloatArrayUtils.toArray(currentUserFace);
+                float[][] embeedings = new float[1][floats.length];
+                embeedings[0] = floats;
+                LOGGER.d("UserFace Value in onCreate : " + currentUserFace);
+                LOGGER.d("UserFace Floats Array  : " + Arrays.toString(floats));
+
+                SimilarityClassifier.Recognition rec = new SimilarityClassifier.Recognition("0", currentUserFullName, -1f, null);
+                rec.setExtra(embeedings);
+                detector.register(currentUserFullName,
+                        rec);
+
         } catch (final IOException e) {
             e.printStackTrace();
             LOGGER.e(e, "Exception initializing classifier!");
@@ -263,12 +273,6 @@ public class DetectorActivity extends CameraActivity {
         return DESIRED_PREVIEW_SIZE;
     }
 
-    // Which detection model to use: by default uses Tensorflow Object Detection API frozen
-    // checkpoints.
-    private enum DetectorMode {
-        TF_OD_API;
-    }
-
     // Face Processing
     private Matrix createTransform(
             final int srcWidth,
@@ -306,43 +310,11 @@ public class DetectorActivity extends CameraActivity {
 
     }
 
-    private void showAddFaceDialog(SimilarityClassifier.Recognition rec) {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogLayout = inflater.inflate(R.layout.image_edit_dialog, null);
-        ImageView ivFace = dialogLayout.findViewById(R.id.dlg_image);
-
-        ivFace.setImageBitmap(rec.getCrop());
-
-        builder.setPositiveButton("OK", (dlg, i) -> {
-            // TODO : you are sending the distance instead
-            sendEmbeedings(FloatArrayUtils.toString(((float[][])rec.getExtra())[0]));
-            dlg.dismiss();
-        });
-        // TODO : Change alert dialog corner radius ?
-        builder.setView(dialogLayout);
-        builder.show();
-
-    }
-
-
     private void updateResults(long currTimestamp, final List<SimilarityClassifier.Recognition> mappedRecognitions) {
 
         tracker.trackResults(mappedRecognitions, currTimestamp);
         trackingOverlay.postInvalidate();
         computingDetection = false;
-        //adding = false;
-
-
-        if (mappedRecognitions.size() > 0) {
-            LOGGER.i("Adding results");
-            SimilarityClassifier.Recognition rec = mappedRecognitions.get(0);
-            if (rec.getExtra() != null) {
-                showAddFaceDialog(rec);
-            }
-
-        }
     }
 
 
@@ -438,8 +410,11 @@ public class DetectorActivity extends CameraActivity {
                     label = result.getTitle();
                     if (result.getId().equals("0")) {
                         color = Color.GREEN;
+                        setResult(RESULT_OK);
+                        finish();
                     } else {
                         color = Color.RED;
+                        label = "Face not recognized";
                     }
                 }
 
@@ -474,12 +449,4 @@ public class DetectorActivity extends CameraActivity {
         updateResults(currTimestamp, mappedRecognitions);
 
     }
-
-    private void sendEmbeedings(String embeedings) {
-        Intent data = new Intent();
-        data.putExtra("embeedings",embeedings);
-        setResult(RESULT_OK,data);
-        finish();
-    }
-
 }

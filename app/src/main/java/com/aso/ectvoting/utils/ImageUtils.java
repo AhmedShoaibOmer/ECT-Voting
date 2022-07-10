@@ -217,7 +217,7 @@ public class ImageUtils {
   }
 
   static public Bitmap getBitmapFromBase64String(String b64String) {
-    byte[] decodedString = Base64.decode(b64String, Base64.DEFAULT);
+    byte[] decodedString = Base64.decode(b64String, Base64.URL_SAFE);
     return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
   }
 

@@ -274,12 +274,7 @@ public class CameraConnectionFragment extends Fragment {
     final Activity activity = getActivity();
     if (activity != null) {
       activity.runOnUiThread(
-              new Runnable() {
-                @Override
-                public void run() {
-                  Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
-                }
-              });
+              () -> Toast.makeText(activity, text, Toast.LENGTH_SHORT).show());
     }
   }
 
@@ -291,7 +286,7 @@ public class CameraConnectionFragment extends Fragment {
 
   @Override
   public void onViewCreated(final View view, final Bundle savedInstanceState) {
-    textureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+    textureView = view.findViewById(R.id.texture);
   }
 
   @Override

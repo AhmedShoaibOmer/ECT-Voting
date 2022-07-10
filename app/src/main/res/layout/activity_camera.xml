@@ -15,9 +15,9 @@
 -->
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:keepScreenOn="true"
     android:background="#00000000">
 
@@ -34,20 +34,6 @@
             android:layout_height="match_parent"
             tools:context="com.aso.ectvoting.ui.recognition.CameraActivity" />
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentTop="true"
-            android:background="@color/tfe_semi_transparent">
-
-            <ImageView
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_switch_camera_24" />
-
-        </androidx.appcompat.widget.Toolbar>
 
     </RelativeLayout>
 
@@ -62,25 +48,14 @@
         />
 
 
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
-        android:tint="@android:color/white"
-        android:src="@android:drawable/ic_input_add"
+        android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        />
-
-     <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_seach"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_search_category_default"
-            android:tint="@android:color/white"
-            android:layout_margin="16dp"
-            />
+        android:src="@drawable/ic_baseline_check_24"
+        android:tint="@android:color/white" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
